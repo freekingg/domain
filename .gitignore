@@ -1,0 +1,6 @@
+node_modules/*
+/dist/
+/.idea/
+/devdist/
+.env.local
+/src/views/trade/TradeRecord

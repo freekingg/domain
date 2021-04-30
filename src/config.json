@@ -1,0 +1,30 @@
+[
+    {
+        "url": "https://juejin.cn/",
+        "statusCode": 200,
+        "status": 1,
+        "img": "1619784653181.png",
+        "duration": 3615
+    },
+    {
+        "url": "https://www.zhihu.com/",
+        "statusCode": 200,
+        "status": 1,
+        "img": "1619784657965.png",
+        "duration": 4143
+    },
+    {
+        "url": "https://www.jianshu.com/",
+        "statusCode": 200,
+        "status": 1,
+        "img": "1619784663311.png",
+        "duration": 5416
+    },
+    {
+        "url": "http://git.oschina.net/",
+        "statusCode": 200,
+        "status": 1,
+        "img": "1619784669957.png",
+        "duration": 8864
+    }
+]

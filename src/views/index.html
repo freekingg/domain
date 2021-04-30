@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <!-- 引入样式 -->
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/element-ui/lib/theme-chalk/index.css"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <!-- 引入组件库 -->
+    <script src="https://unpkg.com/element-ui/lib/index.js"></script>
+    <style>
+      body {
+        background: #000 url("./bg_dark.jpg");
+        background-size: cover;
+      }
+      #app {
+        padding: 30px 10px;
+        max-width: 1000px;
+        height: 100vh;
+        margin: 0 auto;
+      }
+      .main {
+        padding: 20px 30px;
+        padding-top: 5px;
+        background-color: #f5f5f5;
+        border-radius: 8px;
+        box-shadow: 0 0 20px rgb(0 0 0 / 50%);
+      }
+      h3 {
+        text-align: center;
+      }
+      .err-img {
+        width: 100px;
+      }
+      .el-table {
+        margin-top: 10px;
+        height: 100%;
+        overflow: auto;
+      }
+      .el-image {
+        width: 150px;
+        height: 100px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="app">
+      <div class="main">
+        <h3>域名异常监控</h3>
+        <el-form ref="form" size="mini" :inline="true" :model="form">
+          <el-form-item label="域名">
+            <el-input v-model="form.url"></el-input>
+          </el-form-item>
+          <el-form-item>
+            <el-button type="primary" @click="addUrl">添加域名</el-button>
+          </el-form-item>
+        </el-form>
+
+        <el-button
+          type="success"
+          size="larger"
+          round
+          class="all-test"
+          @click="allTest"
+          :loading="loading"
+        >
+          开始监测
+          <template v-if="loading"> {{current+1}}条 </template>
+        </el-button>
+        <el-button
+          v-if="loading"
+          type="danger"
+          size="mini"
+          round
+          class="all-test"
+          @click="stopTest"
+        >
+          停止
+        </el-button>
+        <el-table :data="tableData" style="width: 100%" height="70vh">
+          <el-table-column prop="url" label="域名" width="240">
+          </el-table-column>
+          <el-table-column prop="status" label="状态" width="60">
+            <template slot-scope="scope">
+              <el-tag v-if="scope.row.status == 1">正常</el-tag>
+              <el-tag v-else-if="scope.row.status == 0" type="danger"
+                >异常</el-tag
+              >
+              <el-tag v-else type="danger">
+                <i class="el-icon-loading"></i>
+              </el-tag>
+            </template>
+          </el-table-column>
+          <el-table-column
+            prop="duration"
+            label="响应时间"
+            width="100"
+            align="center"
+          >
+          </el-table-column>
+          <el-table-column prop="url" label="快照">
+            <template slot-scope="scope">
+              <!-- <img class="err-img" :src="scope.row.img" alt="" srcset="" /> -->
+              <el-image :src="scope.row.img"></el-image>
+            </template>
+          </el-table-column>
+          <el-table-column prop="url" label="操作">
+            <template slot-scope="scope">
+              <el-button
+                size="mini"
+                type="primary"
+                :loading="scope.row.loading"
+                @click="testSingle(scope.row,scope.$index)"
+                >检测</el-button
+              >
+              <el-button
+                size="mini"
+                type="danger"
+                @click="remove(scope.row.url)"
+                >删除</el-button
+              >
+            </template>
+          </el-table-column>
+        </el-table>
+      </div>
+    </div>
+  </body>
+  <script>
+    let timer = null;
+    const app = new Vue({
+      el: "#app",
+      data: {
+        loading: false,
+        form: {},
+        tableData: [],
+        current: 0,
+      },
+      created() {
+        this.getList();
+      },
+      methods: {
+        addUrl() {
+          if (!this.form.url) {
+            this.$message.error("请添加域名");
+            return;
+          }
+
+          if (this.loading) {
+            this.$message.error("请先停止监控，再添加域名");
+            return;
+          }
+
+          fetch(`add?url=${this.form.url}`)
+            .then((response) => {
+              return response.json();
+            })
+            .then((myJson) => {
+              if (myJson.code == 0) {
+                this.getList();
+              }
+            });
+        },
+        getList() {
+          fetch("list")
+            .then((response) => {
+              return response.json();
+            })
+            .then((myJson) => {
+              this.tableData = myJson;
+            });
+        },
+        remove(url) {
+
+          if (this.loading) {
+            this.$message.error("请先停止监控，再进行操作");
+            return;
+          }
+
+          fetch(`delete?url=${url}`)
+            .then((response) => {
+              return response.json();
+            })
+            .then((myJson) => {
+              if (myJson.code == 0) {
+                this.getList();
+              }
+            });
+        },
+        async testSingle(item, index) {
+
+          if (this.loading) {
+            this.$message.error("请先停止监控，再进行操作");
+            return;
+          }
+          
+          this.$set(this.tableData, index, { ...item, loading: true });
+          let r = await this.test(item.url);
+          r.loading = false;
+          this.$set(this.tableData, index, r);
+        },
+        test(url) {
+          return new Promise((resolve) => {
+            fetch(`test?url=${url}`)
+              .then((response) => {
+                return response.json();
+              })
+              .then((result) => {
+                console.log("result", result);
+                resolve(result);
+              })
+              .catch((err) => {
+                resolve({
+                  url,
+                  status: 0,
+                  statusCode: 400,
+                  img: "",
+                });
+              });
+          });
+        },
+        async allTest() {
+          this.tableData.map((item, index) => {
+            this.$set(this.tableData, index, { ...item, status: 999 });
+          });
+          this.loading = true;
+          this.current = 0;
+          let len = this.tableData.length;
+          for (const item of this.tableData) {
+            let index = this.tableData.findIndex((ele) => ele.url == item.url);
+            this.$set(this.tableData, index, { ...item, loading: true });
+            let r = await this.test(item.url);
+            if (index !== -1) {
+              this.$set(this.tableData, index, r);
+            }
+            this.current++;
+
+            if (this.current >= len) {
+              console.log("all-ok");
+              clearInterval(timer);
+              timer = setTimeout(this.allTest, 10000);
+              this.loading = false;
+              // this.$message.error('错了哦，这是一条错误消息');
+            }
+          }
+        },
+        stopTest(){
+          window.location.reload()
+        }
+      },
+    });
+  </script>
+</html>
