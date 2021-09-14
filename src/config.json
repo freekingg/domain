@@ -1,30 +1,30 @@
 [
     {
-        "url": "https://juejin.cn/",
-        "statusCode": 200,
-        "status": 1,
-        "img": "1619784653181.png",
-        "duration": 3615
+        "url": "https://ss660099.com",
+        "statusCode": "",
+        "status": 0,
+        "img": "1623583011567.png",
+        "duration": 20068
     },
     {
-        "url": "https://www.zhihu.com/",
-        "statusCode": 200,
-        "status": 1,
-        "img": "1619784657965.png",
-        "duration": 4143
+        "url": "https://ss660066.com",
+        "statusCode": "",
+        "status": 0,
+        "img": "1623582404760.png",
+        "duration": 115
     },
     {
-        "url": "https://www.jianshu.com/",
-        "statusCode": 200,
-        "status": 1,
-        "img": "1619784663311.png",
-        "duration": 5416
+        "url": "https://ss550066.com",
+        "statusCode": "",
+        "status": 0,
+        "img": "1623582405959.png",
+        "duration": 616
     },
     {
-        "url": "http://git.oschina.net/",
+        "url": "https://t.xy88xy.vip:990/t/",
         "statusCode": 200,
         "status": 1,
-        "img": "1619784669957.png",
-        "duration": 8864
+        "img": "1623582407544.png",
+        "duration": 2965
     }
 ]

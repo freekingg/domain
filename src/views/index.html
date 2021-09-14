@@ -224,6 +224,7 @@
           });
         },
         async allTest() {
+          clearInterval(timer);
           this.tableData.map((item, index) => {
             this.$set(this.tableData, index, { ...item, status: 999 });
           });
@@ -242,7 +243,7 @@
             if (this.current >= len) {
               console.log("all-ok");
               clearInterval(timer);
-              timer = setTimeout(this.allTest, 10000);
+              timer = setTimeout(this.allTest, 1000*60*10);
               this.loading = false;
               // this.$message.error('错了哦，这是一条错误消息');
             }
